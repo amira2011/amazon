@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Page Title</title>
+  </head>
+
+  <body>
+    <div class="quote-form">
+      <h3>Compare Best Rates in your Area!</h3>
+      <div class="zip-input-wrapper">
+        <input
+          pattern="[0-9]*"
+          type="tel"
+          id="zipcode"
+          minlength="5"
+          maxlength="5"
+          class="zipcode"
+        />
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-1.10.1.min.js"></script>
+
+    <script>
+      $("#zipcode").on("keyup", function () {
+        $(this).val($(this).val().replace(/[^\d]/g, ""));
+      });
+
+      $(document).ready(function () {
+        function getClientZipcode() {
+          console.log("ok");
+          var ipdata = window.localStorage.getItem("ipdata") || "{}";
+          ipdata = JSON.parse(ipdata);
+          if (ipdata.expire > new Date().getTime()) {
+            setTimeout(function () {
+              $("#zipcode, .zipcode").val(ipdata.postal);
+            }, 1000);
+          } else {
+            $.get(
+              "https://api.ipdata.co/?api-key=8f0f67706338f0343ede110eb33d806da197be435c01b960a2cd1fff",
+              function (data) {
+                $("#zipcode, .zipcode").val(data.postal);
+                data["expire"] = new Date().getTime() + 86400000; // sets expiration time to 24 hours later
+                localStorage.setItem("ipdata", JSON.stringify(data));
+              }
+            );
+          }
+        }
+
+        getClientZipcode();
+      });
+    </script>
+  </body>
+</html>
